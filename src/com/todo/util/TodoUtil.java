@@ -131,7 +131,7 @@ public class TodoUtil {
 			System.out.println("키워드 <" + keyword + "> 를 포함한 총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
 		
 		String readSelect = "select * from " + this.tableName
-				+ " where title like '" + keyword + "' or desc like '" + keyword + "'";
+				+ " where title like '%" + keyword + "%' or desc like '%" + keyword + "%'";
 		ResultSet result = stat.executeQuery(readSelect);
 		listAll(result);
 		stat.close();
@@ -166,7 +166,7 @@ public class TodoUtil {
 		if(count.next())
 			System.out.println("카테고리 <" + keyword + "> 를 포함한 총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
 		
-		String readSelect = "select * from " + this.tableName + " where category like '" + keyword + "'";
+		String readSelect = "select * from " + this.tableName + " where category like '%" + keyword + "%'";
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		listAll(result);
