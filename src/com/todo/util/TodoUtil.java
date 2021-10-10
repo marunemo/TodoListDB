@@ -307,7 +307,8 @@ public class TodoUtil {
 			String category = rs.getString("category");
 			String dueDate = rs.getString("dueDate");
 			String currDate = rs.getString("currDate").replace('-', '/');
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
+			int isCompleted = rs.getInt("isCompleted");
+			System.out.println(String.format("%2s [%s] %s%s | %s - %s ~ %s", id, category, title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
 	}
 }
