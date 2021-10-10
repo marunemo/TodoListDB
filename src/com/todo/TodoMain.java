@@ -16,7 +16,7 @@ public class TodoMain {
 			Menu.displaymenu();
 			do {
 				Menu.prompt();
-				choice = scan.nextLine();
+				choice = scan.next().trim();
 				switch (choice) {
 					case "add":
 						todolist.createTodo();
@@ -43,13 +43,17 @@ public class TodoMain {
 						todolist.dateList(false);
 						break;
 					case "find":
-						todolist.findTodo();
+						todolist.findTodo(scan.nextLine().trim());
 						break;
 					case "find_cate":
-						todolist.findCategory();
+						todolist.findCategory(scan.nextLine().trim());
 						break;
 					case "ls_cate":
 						todolist.categoryList();
+						break;
+					case "comp":
+						break;
+					case "ls_comp":
 						break;
 					case "exit":
 						break;
