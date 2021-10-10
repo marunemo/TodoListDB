@@ -55,7 +55,7 @@ public class TodoUtil {
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 데이터 조회 ===");
-		ResultSet count = stat.executeQuery("select * from " +this.tableName);
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName);
 		if(count.next())
 			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
 		
