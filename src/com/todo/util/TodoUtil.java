@@ -120,14 +120,11 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void findTodo() throws SQLException {
+	public void findTodo(String keyword) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 키워드 검색 ===");
-		System.out.print("검색할 키워드 : ");
-		String keyword = scan.nextLine().trim();
-		
 		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName
 				+ " where title like '" + keyword + "' or desc like '" + keyword + "'");
 		if(count.next())
@@ -160,14 +157,11 @@ public class TodoUtil {
 	}
 	
 
-	public void findCategory() throws SQLException {
+	public void findCategory(String keyword) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 카테고리 검색 ===");
-		System.out.print("검색할 카테고리 : ");
-		String keyword = scan.nextLine().trim();
-		
 		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where category like '" + keyword + "'");
 		if(count.next())
 			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
