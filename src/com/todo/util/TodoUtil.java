@@ -26,6 +26,12 @@ public class TodoUtil {
 		System.out.println("\n=== 데이터 추가 ===");
 		System.out.print("제목 : ");
 		String title = scan.nextLine().trim();
+		
+		if(containsTitle(title)) {
+			System.err.println("이미 존재하는 제목입니다!!");
+			return;
+		}
+		
 		System.out.print("내용 : ");
 		String desc = scan.nextLine().trim();
 		System.out.print("카테고리 : ");
@@ -55,15 +61,7 @@ public class TodoUtil {
 		
 		String readSelect = "select * from " + this.tableName;
 		ResultSet result = stat.executeQuery(readSelect);
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -78,6 +76,12 @@ public class TodoUtil {
 		
 		System.out.print("새 제목 : ");
 		String title = scan.nextLine().trim();
+		
+		if(!title.equals(title) && containsTitle(title)) {
+			System.err.println("이미 존재하는 제목입니다!!");
+			return;
+		}
+		
 		System.out.print("새 내용 : ");
 		String desc = scan.nextLine().trim();
 		System.out.print("새 카테고리 : ");
@@ -132,16 +136,7 @@ public class TodoUtil {
 		String readSelect = "select * from " + this.tableName
 				+ " where title like '" + keyword + "' or desc like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
-		
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -179,16 +174,7 @@ public class TodoUtil {
 		String readSelect = "select * from " + this.tableName + " where category like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
 		
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
-		
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -207,16 +193,7 @@ public class TodoUtil {
 		else
 			System.out.println("정렬할 데이터가 없습니다!");
 		
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
-		
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -238,16 +215,7 @@ public class TodoUtil {
 		else
 			System.out.println("정렬할 데이터가 없습니다!");
 		
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
-		
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -266,16 +234,7 @@ public class TodoUtil {
 		else
 			System.out.println("정렬할 데이터가 없습니다!");
 		
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
-		
+		listAll(result);
 		stat.close();
 		connect.close();
 	}
@@ -296,18 +255,35 @@ public class TodoUtil {
 			System.out.println("데이터가 정렬되었습니다.");
 		else
 			System.out.println("정렬할 데이터가 없습니다!");
+				
+		listAll(result);
+		stat.close();
+		connect.close();
+	}
+	
+	public boolean containsTitle(String title) throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+		int returnCount = 0;
 		
-		while(result.next()) {
-			String id = result.getString("id");
-			String title = result.getString("title");
-			String desc = result.getString("desc");
-			String category = result.getString("category");
-			String dueDate = result.getString("dueDate");
-			String currDate = result.getString("currDate");
-			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
-		}
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where title = '" + title + "'");
+		if(count.next()) returnCount = count.getInt(1);
 		
 		stat.close();
 		connect.close();
+		
+		return (returnCount > 0);
+	}
+	
+	private void listAll(ResultSet rs) throws SQLException {
+		while(rs.next()) {
+			String id = rs.getString("id");
+			String title = rs.getString("title");
+			String desc = rs.getString("desc");
+			String category = rs.getString("category");
+			String dueDate = rs.getString("dueDate");
+			String currDate = rs.getString("currDate").replace('-', '/');
+			System.out.println(String.format("%2s [%s] %s | %s - %s ~ %s", id, category, title, desc, currDate, dueDate));
+		}
 	}
 }
