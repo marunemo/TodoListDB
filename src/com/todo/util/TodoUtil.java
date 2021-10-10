@@ -211,16 +211,16 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void nameList(boolean isDesc) throws SQLException {
+	public void nameList(boolean isAsc) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		if(isDesc)
-			System.out.println("\n=== 이름역순 정렬 ===");
-		else
+		if(isAsc)
 			System.out.println("\n=== 이름순 정렬 ===");
+		else
+			System.out.println("\n=== 이름역순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by title" + (isDesc?" desc":"");
+		String readSelect = "select * from " + tableName + " order by title" + (isAsc?"":" desc");
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
@@ -270,16 +270,16 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void dateList(boolean isDesc) throws SQLException {
+	public void dateList(boolean isAsc) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		if(isDesc)
-			System.out.println("\n=== 날짜역순 정렬 ===");
-		else
+		if(isAsc)
 			System.out.println("\n=== 날짜순 정렬 ===");
+		else
+			System.out.println("\n=== 날짜역순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by dueDate" + (isDesc?" desc":"");
+		String readSelect = "select * from " + tableName + " order by dueDate" + (isAsc?"":" desc");
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
