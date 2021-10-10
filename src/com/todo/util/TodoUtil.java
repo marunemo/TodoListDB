@@ -77,7 +77,7 @@ public class TodoUtil {
 		System.out.print("새 제목 : ");
 		String title = scan.nextLine().trim();
 		
-		if(!title.equals(title) && containsTitle(title)) {
+		if(!target.equals(title) && containsTitle(title)) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
