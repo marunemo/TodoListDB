@@ -122,7 +122,7 @@ public class TodoUtil {
 		System.out.print("검색할 키워드 : ");
 		String keyword = scan.nextLine().trim();
 		
-		String readSelect = "select * from " + tableName
+		String readSelect = "select * from " + this.tableName
 				+ " where title like '" + keyword + "' or desc like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
 		
@@ -145,7 +145,7 @@ public class TodoUtil {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		String readSelect = "select distinct category from " + tableName;
+		String readSelect = "select distinct category from " + this.tableName;
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		System.out.println("\n총 " + result.getRow() + "개의 카테고리를 발견했습니다.");
@@ -165,7 +165,7 @@ public class TodoUtil {
 		System.out.print("검색할 카테고리 : ");
 		String keyword = scan.nextLine().trim();
 		
-		String readSelect = "select * from " + tableName + " where category like '" + keyword + "'";
+		String readSelect = "select * from " + this.tableName + " where category like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		System.out.println("총 " + result.getRow() + "개의 항목을 발견했습니다.");
@@ -189,7 +189,7 @@ public class TodoUtil {
 		
 		System.out.println("\n=== 이름순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by title";
+		String readSelect = "select * from " + this.tableName + " order by title";
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
@@ -220,7 +220,7 @@ public class TodoUtil {
 		else
 			System.out.println("\n=== 이름역순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by title" + (isAsc?"":" desc");
+		String readSelect = "select * from " + this.tableName + " order by title" + (isAsc?"":" desc");
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
@@ -248,7 +248,7 @@ public class TodoUtil {
 		
 		System.out.println("\n=== 날짜순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by dueDate";
+		String readSelect = "select * from " + this.tableName + " order by dueDate";
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
@@ -279,7 +279,7 @@ public class TodoUtil {
 		else
 			System.out.println("\n=== 날짜역순 정렬 ===");
 		
-		String readSelect = "select * from " + tableName + " order by dueDate" + (isAsc?"":" desc");
+		String readSelect = "select * from " + this.tableName + " order by dueDate" + (isAsc?"":" desc");
 		ResultSet result = stat.executeQuery(readSelect);
 		
 		if(result.isBeforeFirst())
