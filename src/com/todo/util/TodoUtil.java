@@ -39,8 +39,8 @@ public class TodoUtil {
 		System.out.print("마감일 : ");
 		String dueDate = scan.nextLine().trim();
 		
-		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate)"
-				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'));";
+		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted)"
+				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime')), 0;";
 		if(stat.executeUpdate(createInsert) > 0)
 			System.out.println("데이터가 추가되었습니다.");
 		else
@@ -179,7 +179,6 @@ public class TodoUtil {
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 이름순 정렬 ===");
-		
 		String readSelect = "select * from " + this.tableName + " order by title";
 		ResultSet result = stat.executeQuery(readSelect);
 		
@@ -220,7 +219,6 @@ public class TodoUtil {
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 날짜순 정렬 ===");
-		
 		String readSelect = "select * from " + this.tableName + " order by dueDate";
 		ResultSet result = stat.executeQuery(readSelect);
 		
@@ -252,6 +250,37 @@ public class TodoUtil {
 			System.out.println("정렬할 데이터가 없습니다!");
 				
 		listAll(result);
+		stat.close();
+		connect.close();
+	}
+	
+	public void completeTodo(int index) throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+				
+		String updateUpdate = "update " + this.tableName
+				+ " set isCompleted = 1 where id = '" + index + "';";
+		if(stat.executeUpdate(updateUpdate) > 0)
+			System.out.println("항목이 완료되었습니다.");
+		else
+			System.err.println("완료 설정에 실패했습니다!");
+		
+		stat.close();
+		connect.close();
+	}
+	
+	public void completeList() throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+				
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where isCompleted = 1");
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
+		
+		String readSelect = "select * from " + this.tableName + " where isCompleted = 1";
+		ResultSet result = stat.executeQuery(readSelect);
+		listAll(result);
+		
 		stat.close();
 		connect.close();
 	}

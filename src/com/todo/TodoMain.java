@@ -52,8 +52,10 @@ public class TodoMain {
 						todolist.categoryList();
 						break;
 					case "comp":
+						todolist.completeTodo(Integer.parseInt(scan.nextLine().trim()));
 						break;
 					case "ls_comp":
+						todolist.completeList();
 						break;
 					case "exit":
 						break;
