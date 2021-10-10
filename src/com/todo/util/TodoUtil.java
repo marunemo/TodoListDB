@@ -40,7 +40,7 @@ public class TodoUtil {
 		String dueDate = scan.nextLine().trim();
 		
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted)"
-				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime')), 0;";
+				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0);";
 		if(stat.executeUpdate(createInsert) > 0)
 			System.out.println("데이터가 추가되었습니다.");
 		else
