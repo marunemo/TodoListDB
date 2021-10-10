@@ -1,6 +1,5 @@
 package com.todo;
 
-import java.io.File;
 import java.util.Scanner;
 
 import com.todo.menu.Menu;
@@ -66,5 +65,6 @@ public class TodoMain {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		scan.close();
 	}
 }
