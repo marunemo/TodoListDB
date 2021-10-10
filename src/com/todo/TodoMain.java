@@ -65,6 +65,7 @@ public class TodoMain {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("종료되었습니다.");
 		scan.close();
 	}
 }

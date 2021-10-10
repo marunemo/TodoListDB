@@ -49,10 +49,12 @@ public class TodoUtil {
 		Statement stat = connect.createStatement();
 		
 		System.out.println("\n=== 데이터 조회 ===");
-		String readSelect = "select * from " + tableName;
-		ResultSet result = stat.executeQuery(readSelect);
+		ResultSet count = stat.executeQuery("select * from " +this.tableName);
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
 		
-		System.out.println("총 " + result.getRow() + "개의 항목을 발견했습니다.");
+		String readSelect = "select * from " + this.tableName;
+		ResultSet result = stat.executeQuery(readSelect);
 		while(result.next()) {
 			String id = result.getString("id");
 			String title = result.getString("title");
@@ -122,11 +124,14 @@ public class TodoUtil {
 		System.out.print("검색할 키워드 : ");
 		String keyword = scan.nextLine().trim();
 		
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName
+				+ " where title like '" + keyword + "' or desc like '" + keyword + "'");
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
+		
 		String readSelect = "select * from " + this.tableName
 				+ " where title like '" + keyword + "' or desc like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
-		
-		System.out.println("총 " + result.getRow() + "개의 항목을 발견했습니다.");
 		while(result.next()) {
 			String id = result.getString("id");
 			String title = result.getString("title");
@@ -145,10 +150,12 @@ public class TodoUtil {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		String readSelect = "select distinct category from " + this.tableName;
-		ResultSet result = stat.executeQuery(readSelect);
+		ResultSet count = stat.executeQuery("select count(distinct category) from " + this.tableName);
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 카테고리를 발견했습니다.");
 		
-		System.out.println("\n총 " + result.getRow() + "개의 카테고리를 발견했습니다.");
+		String readSelect = "select distinct category from " + this.tableName;
+		ResultSet result = stat.executeQuery(readSelect);		
 		while(result.next())
 			System.out.println(result.getString(0) + " ");
 		
@@ -165,10 +172,13 @@ public class TodoUtil {
 		System.out.print("검색할 카테고리 : ");
 		String keyword = scan.nextLine().trim();
 		
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where category like '" + keyword + "'");
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
+		
 		String readSelect = "select * from " + this.tableName + " where category like '" + keyword + "'";
 		ResultSet result = stat.executeQuery(readSelect);
 		
-		System.out.println("총 " + result.getRow() + "개의 항목을 발견했습니다.");
 		while(result.next()) {
 			String id = result.getString("id");
 			String title = result.getString("title");
