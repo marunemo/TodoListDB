@@ -152,7 +152,8 @@ public class TodoUtil {
 		String readSelect = "select distinct category from " + this.tableName;
 		ResultSet result = stat.executeQuery(readSelect);		
 		while(result.next())
-			System.out.println(result.getString(0) + " ");
+			System.out.print("[" + result.getString(1) + "] ");
+		System.out.println();
 		
 		stat.close();
 		connect.close();
