@@ -98,13 +98,21 @@ public class TodoUtil {
 		String desc = scan.nextLine().trim();
 		System.out.print("새 카테고리 : ");
 		String category = scan.nextLine().trim();
-		System.out.print("새 마감일 : ");
-		String dueDate = scan.nextLine().trim();
+		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n)");
+		int isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		String dueDate = "";
+		if(isRoutine != 1) {			
+			System.out.print("새 마감일 : ");
+			dueDate = scan.nextLine().trim();
+		}
+		System.out.print("중요 활동으로 설정하시겠습니까? (y/n)");
+		int isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
 		
 		String updateUpdate = "update " + this.tableName
 				+ " set title = '" + title + "', desc = '" + desc
 				+ "', category = '" + category + "', dueDate = '" + dueDate
-				+ "', currDate = datetime('now', 'localtime') where title = '" + target + "';";
+				+ "', currDate = datetime('now', 'localtime'), isRoutine = " + isRoutine 
+				+ ", isRequired = " + isRequired + "where title = '" + target + "';";
 		if(stat.executeUpdate(updateUpdate) > 0)
 			System.out.println("데이터가 수정되었습니다.");
 		else
