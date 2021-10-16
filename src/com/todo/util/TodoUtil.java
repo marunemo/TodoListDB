@@ -38,9 +38,13 @@ public class TodoUtil {
 		String category = scan.nextLine().trim();
 		System.out.print("마감일 : ");
 		String dueDate = scan.nextLine().trim();
+		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n)");
+		int isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		System.out.print("중요 활동으로 설정하시겠습니까? (y/n)");
+		int isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
 		
-		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted)"
-				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0);";
+		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
+				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0, " + isRoutine + ", " + isRequired +");";
 		if(stat.executeUpdate(createInsert) > 0)
 			System.out.println("데이터가 추가되었습니다.");
 		else
