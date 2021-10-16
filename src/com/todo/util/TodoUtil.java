@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class TodoUtil {
@@ -320,7 +322,13 @@ public class TodoUtil {
 			int isCompleted = rs.getInt("isCompleted");
 			int isRoutine = rs.getInt("isRoutine");
 			int isRequired = rs.getInt("isRequired");
-			System.out.println(String.format("%2s [%s] %s%s | %s - %s ~ %s", id, category, title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+			if(isRoutine == 1) {
+				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+				Date today = new Date();
+				currDate = format.format(today) + " 00:00:00";
+				dueDate = format.format(today) + " 23:59:59";
+			}
+			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
 	}
 }
