@@ -22,10 +22,12 @@ public class TodoUtil {
 	public void createTodo() throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
+		String title, desc, category, dueDate;
+		int isRoutine, isRequired; 
 		
 		System.out.println("\n=== 데이터 추가 ===");
 		System.out.print("제목 : ");
-		String title = scan.nextLine().trim();
+		title = scan.nextLine().trim();
 		
 		if(containsTitle(title)) {
 			System.err.println("이미 존재하는 제목입니다!!");
@@ -33,15 +35,19 @@ public class TodoUtil {
 		}
 		
 		System.out.print("내용 : ");
-		String desc = scan.nextLine().trim();
+		desc = scan.nextLine().trim();
 		System.out.print("카테고리 : ");
-		String category = scan.nextLine().trim();
-		System.out.print("마감일 : ");
-		String dueDate = scan.nextLine().trim();
+		category = scan.nextLine().trim();
 		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n)");
-		int isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		if(isRoutine == 1)
+			dueDate = "";
+		else {
+			System.out.print("마감일 : ");
+			dueDate = scan.nextLine().trim();
+		}
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n)");
-		int isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
+		isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
 		
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0, " + isRoutine + ", " + isRequired +");";
@@ -312,6 +318,8 @@ public class TodoUtil {
 			String dueDate = rs.getString("dueDate");
 			String currDate = rs.getString("currDate").replace('-', '/');
 			int isCompleted = rs.getInt("isCompleted");
+			int isRoutine = rs.getInt("isRoutine");
+			int isRequired = rs.getInt("isRequired");
 			System.out.println(String.format("%2s [%s] %s%s | %s - %s ~ %s", id, category, title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
 	}
