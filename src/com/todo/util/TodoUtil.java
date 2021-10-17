@@ -25,7 +25,7 @@ public class TodoUtil {
 	public void createTodo() throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
-		String title, desc, category, dueDate;
+		String title, desc, category, dueDate, currDate;
 		int isRoutine, isRequired; 
 		
 		System.out.println("\n=== 데이터 추가 ===");
@@ -52,10 +52,26 @@ public class TodoUtil {
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
 		isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+		Date today = new Date();
+		currDate = format.format(today);
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
-				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0, " + isRoutine + ", " + isRequired +");";
-		if(stat.executeUpdate(createInsert) > 0)
+				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+		if(stat.executeUpdate(createInsert) > 0) {
 			System.out.println("데이터가 추가되었습니다.");
+			String createCateTable = "create table if not exists " + category
+					+ " (id int, title text, desc text, dueDate text,"
+					+ " currDate text, isCompleted int, isRoutine int, isRequired int)";
+			if(stat.executeUpdate(createCateTable) > 0) {
+				String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
+						+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+				stat.executeUpdate(createCategory);
+				System.out.println("카테고리 테이블이 추가되었습니다.");
+			}
+			else {
+				System.err.println("카테고리 테이블 추가에 실패했습니다!");
+			}
+		}
 		else
 			System.err.println("데이터 추가에 실패했습니다!");
 		
@@ -109,13 +125,23 @@ public class TodoUtil {
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
 		int isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+		Date today = new Date();
+		String currDate = format.format(today);
 		String updateUpdate = "update " + this.tableName
 				+ " set title = '" + title + "', desc = '" + desc
 				+ "', category = '" + category + "', dueDate = '" + dueDate
-				+ "', currDate = datetime('now', 'localtime'), isRoutine = " + isRoutine 
-				+ ", isRequired = " + isRequired + "where title = '" + target + "';";
-		if(stat.executeUpdate(updateUpdate) > 0)
+				+ "', currDate = '" + currDate + "', isRoutine = " + isRoutine 
+				+ ", isRequired = " + isRequired + " where title = '" + target + "';";
+		if(stat.executeUpdate(updateUpdate) > 0) {
+			String updateCategory = "update " + category
+					+ " set title = '" + title + "', desc = '" + desc
+					+ "', dueDate = '" + dueDate
+					+ "', currDate = '" + currDate + "', isRoutine = " + isRoutine 
+					+ ", isRequired = " + isRequired + " where title = '" + target + "';";
+			stat.executeUpdate(updateCategory);
 			System.out.println("데이터가 수정되었습니다.");
+		}
 		else
 			System.err.println("데이터 수정에 실패했습니다!");
 		
@@ -131,9 +157,24 @@ public class TodoUtil {
 		System.out.print("삭제할 제목 : ");
 		String title = scan.nextLine().trim();
 		
+		
 		String deleteDelete = "delete from " + this.tableName + " where title = '" + title + "';";
-		if(stat.executeUpdate(deleteDelete) > 0)
+		if(stat.executeUpdate(deleteDelete) > 0) {
+			String category = getCategory(connect, stat, this.tableName, title);
+			int dataCount = 0;
+			ResultSet count = stat.executeQuery("select count(*) from " + category);
+			if(count.next())
+				dataCount = count.getInt(1);
+			if(dataCount <= 1) {
+				String deleteTable = "drop table " + category;
+				stat.executeUpdate(deleteTable);
+			}
+			else {
+				String deleteCategory = "delete from " + category + " where title = '" + title + "';";
+				stat.executeUpdate(deleteCategory);
+			}
 			System.out.println("데이터가 수정되었습니다.");
+		}
 		else
 			System.err.println("데이터 수정에 실패했습니다!");
 		
@@ -193,7 +234,7 @@ public class TodoUtil {
 		for(String category : cateList) {
 			String readSelect = "select * from " + category;
 			ResultSet result = stat.executeQuery(readSelect);
-			listAll(result);
+			listAll(result, category);
 		}
 		
 		stat.close();
@@ -344,5 +385,41 @@ public class TodoUtil {
 			}
 			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
+	}
+	
+	private void listAll(ResultSet rs, String category) throws SQLException {
+		while(rs.next()) {
+			String id = rs.getString("id");
+			String title = rs.getString("title");
+			String desc = rs.getString("desc");
+			String dueDate = rs.getString("dueDate");
+			String currDate = rs.getString("currDate").replace('-', '/');
+			int isCompleted = rs.getInt("isCompleted");
+			int isRoutine = rs.getInt("isRoutine");
+			int isRequired = rs.getInt("isRequired");
+			if(isRoutine == 1) {
+				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+				Date today = new Date();
+				currDate = format.format(today) + " 00:00:00";
+				dueDate = format.format(today) + " 23:59:59";
+			}
+			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+		}
+	}
+	
+	private int getId(Connection connect, Statement stat, String tableName, String title) throws SQLException {
+		int targetId = -1;
+		ResultSet id = stat.executeQuery("select id from " + tableName + " where title = '" + title + "';");
+		if(id.next())
+			targetId = id.getInt(1);
+		return targetId;
+	}
+	
+	private String getCategory(Connection connect, Statement stat, String tableName, String title) throws SQLException {
+		String targetCategory = "";
+		ResultSet category = stat.executeQuery("select category from " + tableName + " where title = '" + title + "';");
+		if(category.next())
+			targetCategory = category.getString(1);
+		return targetCategory;
 	}
 }
