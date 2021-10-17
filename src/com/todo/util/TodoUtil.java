@@ -32,7 +32,7 @@ public class TodoUtil {
 		System.out.print("제목 : ");
 		title = scan.nextLine().trim();
 		
-		if(containsTitle(title) == -1) {
+		if(containsTitle(title) != -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
@@ -106,7 +106,7 @@ public class TodoUtil {
 		System.out.print("새 제목 : ");
 		String title = scan.nextLine().trim();
 		
-		if(!target.equals(title) && containsTitle(title) == -1) {
+		if(!target.equals(title) && containsTitle(title) != -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
