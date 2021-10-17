@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TodoUtil {
@@ -180,16 +181,21 @@ public class TodoUtil {
 	public void findCategory(String keyword) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
+		ArrayList<String> cateList = new ArrayList<String>();
+		ArrayList<String> dataList = new ArrayList<String>();
 		
 		System.out.println("\n=== 카테고리 검색 ===");
-		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where category like '%" + keyword + "%'");
-		if(count.next())
-			System.out.println("카테고리 <" + keyword + "> 를 포함한 총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
+		ResultSet count = stat.executeQuery("select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and name like '%" + keyword + "%';");
+		while(count.next())
+			cateList.add(count.getString(1));
 		
-		String readSelect = "select * from " + this.tableName + " where category like '%" + keyword + "%'";
-		ResultSet result = stat.executeQuery(readSelect);
+		System.out.println("카테고리 <" + keyword + "> 를 포함한 총 " + cateList.size() + "개의 항목을 발견했습니다.");		
+		for(String category : cateList) {
+			String readSelect = "select * from " + category;
+			ResultSet result = stat.executeQuery(readSelect);
+			listAll(result);
+		}
 		
-		listAll(result);
 		stat.close();
 		connect.close();
 	}
