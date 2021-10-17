@@ -65,6 +65,9 @@ public class TodoMain {
 					case "ls_req":
 						todolist.requireList();
 						break;
+					case "clean":
+						todolist.clearTodo();
+						break;
 					case "exit":
 						break;
 					case "help":

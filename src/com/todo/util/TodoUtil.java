@@ -502,4 +502,57 @@ public class TodoUtil {
 			targetCategory = category.getString(1);
 		return targetCategory;
 	}
+	
+	public void clearTodo() throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
+		Date today = new Date();
+		String currDate = format.format(today);
+		
+		String readSelect = "select * from " + this.tableName;
+		ResultSet rs = stat.executeQuery(readSelect);
+		
+		while(rs.next()) {
+			String title = rs.getString("title");
+			String desc = rs.getString("desc");
+			String category = rs.getString("category");
+			String dueDate = rs.getString("dueDate");
+			int isCompleted = rs.getInt("isCompleted");
+			int isRoutine = rs.getInt("isRoutine");
+			int isRequired = rs.getInt("isRequired");
+			if(isRoutine != 1 && dueDate.compareTo(currDate) < 0) {
+				if(isCompleted != 1) {
+					if(isRequired != 1)
+						deleteTodo(title);
+					else {
+						System.out.println("다음 항목의 마감 시간이 지났습니다.");
+						System.out.println(String.format("[%s] %s | %s", category, title, desc));
+						System.out.print("마감 시간을 연장하시겠습니까? (y/n) ");
+						if(!scan.nextLine().trim().matches("[yY]"))
+							deleteTodo(title);
+						else {
+							System.out.print("새로운 마감 시간을 작성해주세요 : ");
+							String newDate = scan.nextLine().trim();
+							String updateUpdate = "update " + this.tableName
+									+ " set dueDate = '" + newDate + "' where title = '" + title + "';";
+							if(stat.executeUpdate(updateUpdate) > 0) {
+								String updateCategory = "update " + category
+										+ " set dueDate = '" + newDate + "' where title = '" + title + "';";
+								stat.executeUpdate(updateCategory);
+								System.out.println("마감 시간이 수정되었습니다.");
+							}
+							else {
+								System.err.println("수정 중 오류가 발생했습니다!");
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		stat.close();
+		connect.close();
+	}
 }
