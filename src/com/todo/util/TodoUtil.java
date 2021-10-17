@@ -533,6 +533,7 @@ public class TodoUtil {
 				}
 			}
 		}
+		System.out.println("항목이 모두 정리되었습니다.");
 		
 		stat.close();
 		connect.close();
@@ -554,7 +555,7 @@ public class TodoUtil {
 		
 		while(rs.next()) {
 			TodoItem todo = new TodoItem(rs);
-			String jsonData = gson.toJson(todo.toString());
+			String jsonData = gson.toJson(todo);
 			writer.write(jsonData);
 		}
 		System.out.println("json 파일을 내보냈습니다! (파일명: TodoItem.json)");

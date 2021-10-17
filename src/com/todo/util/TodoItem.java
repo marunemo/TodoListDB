@@ -15,7 +15,7 @@ public class TodoItem {
 	public int isCompleted;
 	public int isRoutine;
 	public int isRequired; 
-	SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+	private transient SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
 	
 	public TodoItem() {}
 	

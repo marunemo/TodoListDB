@@ -69,7 +69,7 @@ public class TodoMain {
 						todolist.clearTodo();
 						break;
 					case "export":
-						todolist.clearTodo();
+						todolist.exportTodo();
 						break;
 					case "exit":
 						break;
