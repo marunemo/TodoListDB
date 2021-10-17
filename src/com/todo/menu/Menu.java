@@ -19,6 +19,7 @@ public class Menu {
         System.out.println("req <제목> : 해당 제목들을 가진 항목에 중요 표시를 합니다.");
         System.out.println("ls_req : 중요 표시된 항목을 출력합니다.");
         System.out.println("clean : Todo 항목들을 정리합니다.");
+        System.out.println("export : Todo 항목을 json 파일로 내보냅니다.");
         System.out.println("exit : 프로그램을 종료합니다.");
     }
     

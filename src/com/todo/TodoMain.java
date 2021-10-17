@@ -68,6 +68,9 @@ public class TodoMain {
 					case "clean":
 						todolist.clearTodo();
 						break;
+					case "export":
+						todolist.clearTodo();
+						break;
 					case "exit":
 						break;
 					case "help":

@@ -25,40 +25,40 @@ public class TodoUtil {
 	public void createTodo() throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
-		String title, desc, category, dueDate, currDate;
-		int isRoutine, isRequired; 
+		TodoItem todo = new TodoItem();
 		
 		System.out.println("\n=== 데이터 추가 ===");
 		System.out.print("제목 : ");
-		title = scan.nextLine().trim();
+		todo.title = scan.nextLine().trim();
 		
-		if(containsTitle(title) != -1) {
+		if(containsTitle(todo.title) != -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
 		
 		System.out.print("내용 : ");
-		desc = scan.nextLine().trim();
+		todo.desc = scan.nextLine().trim();
 		System.out.print("카테고리 : ");
-		category = scan.nextLine().trim();
+		todo.category = scan.nextLine().trim();
 		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n) ");
-		isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
-		if(isRoutine == 1)
-			dueDate = "";
+		todo.isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
+		if(todo.isRoutine == 1)
+			todo.dueDate = "";
 		else {
 			System.out.print("마감일 : ");
-			dueDate = scan.nextLine().trim();
+			todo.dueDate = scan.nextLine().trim();
 		}
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
-		isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
+		todo.isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
 		Date today = new Date();
-		currDate = format.format(today);
+		todo.currDate = format.format(today);
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
-				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+				+ "values ('" + todo.title + "', '" + todo.desc + "', '" + todo.category + "', '" + todo.dueDate + "', '" + todo.currDate + "', 0, " + todo.isRoutine + ", " + todo.isRequired +");";
 		if(stat.executeUpdate(createInsert) > 0) {
-			createCateTable(connect, stat, category, getId(connect, stat, this.tableName, title), title, desc, dueDate, currDate, isRequired, isRoutine, isRequired);
+			todo.id = "" + getId(connect, stat, this.tableName, todo.title);
+			createCateTable(connect, stat, todo);
 			System.out.println("데이터가 추가되었습니다.");
 		}
 		else
@@ -68,14 +68,17 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	private void createCateTable(Connection connect, Statement stat, String category, int id, String title, String desc, String dueDate, String currDate, int isCompleted, int isRoutine, int isRequired) throws SQLException {
-		String createCateTable = "create table if not exists " + category
+	private void createCateTable(Connection connect, Statement stat, TodoItem item) throws SQLException {
+		String createCateTable = "create table if not exists " + item.category
 				+ " (id int, title text, desc text, dueDate text,"
 				+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
 		stat.execute(createCateTable);
 		
-		String createCategory = "insert into " + category + " (id, title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
-				+ "values (" + id + ", '" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+		String createCategory = "insert into " + item.category
+				+ " (id, title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
+				+ "values (" + item.id + ", '" + item.title + "', '" + item.desc + "', '"
+				+ item.dueDate + "', '" + item.currDate + "', 0, " + item.isRoutine + ", "
+				+ item.isRequired +");";
 		stat.executeUpdate(createCategory);
 	}
 	
@@ -98,6 +101,7 @@ public class TodoUtil {
 	public void updateTodo() throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
+		TodoItem todo = new TodoItem();
 		
 		System.out.println("\n=== 데이터 수정 ===");
 		System.out.print("수정할 제목 : ");
@@ -110,38 +114,39 @@ public class TodoUtil {
 		String targetCategory = getCategory(connect, stat, this.tableName, target);
 		
 		System.out.print("새 제목 : ");
-		String title = scan.nextLine().trim();
+		todo.title = scan.nextLine().trim();
 		
-		if(!target.equals(title) && containsTitle(title) != -1) {
+		if(!target.equals(todo.title) && containsTitle(todo.title) != -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
 		
 		System.out.print("새 내용 : ");
-		String desc = scan.nextLine().trim();
+		todo.desc = scan.nextLine().trim();
 		System.out.print("새 카테고리 : ");
-		String category = scan.nextLine().trim();
+		todo.category = scan.nextLine().trim();
 		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n) ");
-		int isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
-		String dueDate = "";
-		if(isRoutine != 1) {			
+		todo.isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
+		todo.dueDate = "";
+		if(todo.isRoutine != 1) {			
 			System.out.print("새 마감일 : ");
-			dueDate = scan.nextLine().trim();
+			todo.dueDate = scan.nextLine().trim();
 		}
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
-		int isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
+		todo.isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
 		Date today = new Date();
-		String currDate = format.format(today);
+		todo.currDate = format.format(today);
 		String updateUpdate = "update " + this.tableName
-				+ " set title = '" + title + "', desc = '" + desc
-				+ "', category = '" + category + "', dueDate = '" + dueDate
-				+ "', currDate = '" + currDate + "', isRoutine = " + isRoutine 
-				+ ", isRequired = " + isRequired + " where title = '" + target + "';";
+				+ " set title = '" + todo.title + "', desc = '" + todo.desc
+				+ "', category = '" + todo.category + "', dueDate = '" + todo.dueDate
+				+ "', currDate = '" + todo.currDate + "', isRoutine = " + todo.isRoutine 
+				+ ", isRequired = " + todo.isRequired + " where title = '" + target + "';";
 		if(stat.executeUpdate(updateUpdate) > 0) {
 			deleteCateTable(connect, stat, targetCategory, target);
-			createCateTable(connect, stat, category, getId(connect, stat, this.tableName, title), title, desc, dueDate, currDate, isRequired, isRoutine, isRequired);
+			todo.id = "" + getId(connect, stat, this.tableName, todo.title);
+			createCateTable(connect, stat, todo);
 			System.out.println("데이터가 수정되었습니다.");
 		}
 		else
@@ -448,42 +453,15 @@ public class TodoUtil {
 	
 	private void listAll(ResultSet rs) throws SQLException {
 		while(rs.next()) {
-			String id = rs.getString("id");
-			String title = rs.getString("title");
-			String desc = rs.getString("desc");
-			String category = rs.getString("category");
-			String dueDate = rs.getString("dueDate");
-			String currDate = rs.getString("currDate").replace('-', '/');
-			int isCompleted = rs.getInt("isCompleted");
-			int isRoutine = rs.getInt("isRoutine");
-			int isRequired = rs.getInt("isRequired");
-			if(isRoutine == 1) {
-				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-				Date today = new Date();
-				currDate = format.format(today) + " 00:00:00";
-				dueDate = format.format(today) + " 23:59:59";
-			}
-			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+			TodoItem todo = new TodoItem(rs);
+			System.out.println(todo.toString());
 		}
 	}
 	
 	private void listAll(ResultSet rs, String category) throws SQLException {
 		while(rs.next()) {
-			String id = rs.getString("id");
-			String title = rs.getString("title");
-			String desc = rs.getString("desc");
-			String dueDate = rs.getString("dueDate");
-			String currDate = rs.getString("currDate").replace('-', '/');
-			int isCompleted = rs.getInt("isCompleted");
-			int isRoutine = rs.getInt("isRoutine");
-			int isRequired = rs.getInt("isRequired");
-			if(isRoutine == 1) {
-				SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
-				Date today = new Date();
-				currDate = format.format(today) + " 00:00:00";
-				dueDate = format.format(today) + " 23:59:59";
-			}
-			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+			TodoItem todo = new TodoItem(rs, category);
+			System.out.println(todo.toString());
 		}
 	}
 	
@@ -550,6 +528,27 @@ public class TodoUtil {
 					}
 				}
 			}
+		}
+		
+		stat.close();
+		connect.close();
+	}
+	
+	public void exportTodo() throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+		
+		System.out.println("\n=== json 출력 ===");
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName);
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 항목을 내보냅니다.");
+		
+		String readSelect = "select * from " + this.tableName;
+		ResultSet rs = stat.executeQuery(readSelect);
+		
+		while(rs.next()) {
+			TodoItem todo = new TodoItem(rs);
+			System.out.println(todo.toString());
 		}
 		
 		stat.close();
