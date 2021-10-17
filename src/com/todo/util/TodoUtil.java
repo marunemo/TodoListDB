@@ -60,7 +60,7 @@ public class TodoUtil {
 		if(stat.executeUpdate(createInsert) > 0) {
 			System.out.println("데이터가 추가되었습니다.");
 			String createCateTable = "create table if not exists " + category
-					+ " (id int, title text, desc text, dueDate text,"
+					+ " (title text, desc text, dueDate text,"
 					+ " currDate text, isCompleted int, isRoutine int, isRequired int)";
 			if(stat.executeUpdate(createCateTable) > 0) {
 				String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
@@ -166,7 +166,7 @@ public class TodoUtil {
 			if(count.next())
 				dataCount = count.getInt(1);
 			if(dataCount <= 1) {
-				String deleteTable = "drop table " + category;
+				String deleteTable = "drop table " + category + ";";
 				stat.executeUpdate(deleteTable);
 			}
 			else {
