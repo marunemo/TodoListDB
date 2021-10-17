@@ -62,7 +62,6 @@ public class TodoUtil {
 			String createCateTable = "create table if not exists " + category
 					+ " (title text, desc text, dueDate text,"
 					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
-			System.out.println(createCateTable);
 			stat.execute(createCateTable);
 			String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 					+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
@@ -386,7 +385,6 @@ public class TodoUtil {
 	
 	private void listAll(ResultSet rs, String category) throws SQLException {
 		while(rs.next()) {
-			String id = rs.getString("id");
 			String title = rs.getString("title");
 			String desc = rs.getString("desc");
 			String dueDate = rs.getString("dueDate");
