@@ -172,6 +172,30 @@ public class TodoUtil {
 		connect.close();
 	}
 	
+	public void deleteList(String multi_item) throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+		
+		String[] items = multi_item.split(",");
+		for(String item : items) {
+			String title = item.trim();
+			String category = getCategory(connect, stat, this.tableName, title);
+			
+			String deleteDelete = "delete from " + this.tableName + " where title = '" + title + "';";
+			if(stat.executeUpdate(deleteDelete) > 0) {
+				deleteCateTable(connect, stat, category, title);
+			}
+			else {
+				System.err.println("데이터 수정에 실패했습니다! (error: " + title + ")");
+				return;
+			}
+		}
+		System.out.println("데이터가 수정되었습니다.");
+		
+		stat.close();
+		connect.close();
+	}
+	
 	private void deleteCateTable(Connection connect, Statement stat, String category, String title) throws SQLException {
 		int dataCount = 0;
 		ResultSet count = stat.executeQuery("select count(*) from " + category);
@@ -408,7 +432,7 @@ public class TodoUtil {
 				currDate = format.format(today) + " 00:00:00";
 				dueDate = format.format(today) + " 23:59:59";
 			}
-			System.out.println(String.format("[%s] %s%s%s | %s - %s ~ %s", category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
 	}
 	

@@ -22,7 +22,10 @@ public class TodoMain {
 						todolist.createTodo();
 						break;
 					case "del":
-						todolist.deleteTodo();
+						if(scan.hasNextLine())
+							todolist.deleteList(scan.nextLine().trim());
+						else
+							todolist.deleteTodo();
 						break;
 					case "edit":
 						todolist.updateTodo();
