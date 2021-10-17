@@ -58,7 +58,6 @@ public class TodoUtil {
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
 		if(stat.executeUpdate(createInsert) > 0) {
-			System.out.println("데이터가 추가되었습니다.");
 			String createCateTable = "create table if not exists " + category
 					+ " (title text, desc text, dueDate text,"
 					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
@@ -66,7 +65,7 @@ public class TodoUtil {
 			String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 					+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
 			stat.executeUpdate(createCategory);
-			System.out.println("카테고리 테이블이 추가되었습니다.");
+			System.out.println("데이터가 추가되었습니다.");
 		}
 		else
 			System.err.println("데이터 추가에 실패했습니다!");
@@ -152,15 +151,16 @@ public class TodoUtil {
 		System.out.println("\n=== 데이터 삭제 ===");
 		System.out.print("삭제할 제목 : ");
 		String title = scan.nextLine().trim();
-		
+		String category = getCategory(connect, stat, this.tableName, title);
 		
 		String deleteDelete = "delete from " + this.tableName + " where title = '" + title + "';";
 		if(stat.executeUpdate(deleteDelete) > 0) {
-			String category = getCategory(connect, stat, this.tableName, title);
+			System.out.println(category);
 			int dataCount = 0;
 			ResultSet count = stat.executeQuery("select count(*) from " + category);
 			if(count.next())
 				dataCount = count.getInt(1);
+			
 			if(dataCount <= 1) {
 				String deleteTable = "drop table " + category + ";";
 				stat.executeUpdate(deleteTable);
@@ -219,14 +219,13 @@ public class TodoUtil {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		ArrayList<String> cateList = new ArrayList<String>();
-		ArrayList<String> dataList = new ArrayList<String>();
 		
 		System.out.println("\n=== 카테고리 검색 ===");
 		ResultSet count = stat.executeQuery("select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and not name = 'TodoItem' and name like '%" + keyword + "%';");
 		while(count.next())
 			cateList.add(count.getString(1));
 		
-		System.out.println("카테고리 <" + keyword + "> 를 포함한 총 " + cateList.size() + "개의 항목을 발견했습니다.");		
+		System.out.println("키워드 <" + keyword + "> 를 포함한 총 " + cateList.size() + "개의 카테고리를 발견했습니다.");		
 		for(String category : cateList) {
 			String readSelect = "select * from " + category;
 			ResultSet result = stat.executeQuery(readSelect);
