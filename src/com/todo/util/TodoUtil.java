@@ -62,15 +62,12 @@ public class TodoUtil {
 			String createCateTable = "create table if not exists " + category
 					+ " (title text, desc text, dueDate text,"
 					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
-			if(stat.execute(createCateTable)) {
-				String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
-						+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
-				stat.executeUpdate(createCategory);
-				System.out.println("카테고리 테이블이 추가되었습니다.");
-			}
-			else {
-				System.err.println("카테고리 테이블 추가에 실패했습니다!");
-			}
+			System.out.println(createCateTable);
+			stat.execute(createCateTable);
+			String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
+					+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+			stat.executeUpdate(createCategory);
+			System.out.println("카테고리 테이블이 추가되었습니다.");
 		}
 		else
 			System.err.println("데이터 추가에 실패했습니다!");
