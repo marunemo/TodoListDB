@@ -506,8 +506,16 @@ public class TodoUtil {
 			int isRequired = rs.getInt("isRequired");
 			if(isRoutine != 1 && dueDate.compareTo(currDate) < 0) {
 				if(isCompleted != 1) {
-					if(isRequired != 1)
-						deleteTodo(title);
+					if(isRequired != 1) {
+						String deleteDelete = "delete from " + this.tableName + " where title = '" + title + "';";
+						if(stat.executeUpdate(deleteDelete) > 0) {
+							deleteCateTable(connect, stat, category, title);
+						}
+						else {
+							System.err.println("데이터 수정에 실패했습니다! (error: " + title + ")");
+							return;
+						}
+					}
 					else {
 						System.out.println("다음 항목의 마감 시간이 지났습니다.");
 						System.out.println(String.format("[%s] %s | %s", category, title, desc));
