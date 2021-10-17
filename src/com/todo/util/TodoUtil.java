@@ -61,7 +61,7 @@ public class TodoUtil {
 			System.out.println("데이터가 추가되었습니다.");
 			String createCateTable = "create table if not exists " + category
 					+ " (title text, desc text, dueDate text,"
-					+ " currDate text, isCompleted int, isRoutine int, isRequired int)";
+					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
 			if(stat.executeUpdate(createCateTable) > 0) {
 				String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 						+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
