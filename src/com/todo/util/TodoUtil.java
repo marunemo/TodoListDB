@@ -163,11 +163,11 @@ public class TodoUtil {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		ResultSet count = stat.executeQuery("select count(*) from sqlite_master where type = 'table' and not name = 'sqlite_sequence';");
+		ResultSet count = stat.executeQuery("select count(*) from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and not name = 'TodoItem';");
 		if(count.next())
 			System.out.println("총 " + count.getInt(1) + "개의 카테고리를 발견했습니다.");
 		
-		String readSelect = "select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence';";
+		String readSelect = "select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and not name = 'TodoItem';";
 		ResultSet result = stat.executeQuery(readSelect);		
 		while(result.next())
 			System.out.print("[" + result.getString(1) + "] ");
@@ -185,7 +185,7 @@ public class TodoUtil {
 		ArrayList<String> dataList = new ArrayList<String>();
 		
 		System.out.println("\n=== 카테고리 검색 ===");
-		ResultSet count = stat.executeQuery("select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and name like '%" + keyword + "%';");
+		ResultSet count = stat.executeQuery("select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence' and not name = 'TodoItem' and name like '%" + keyword + "%';");
 		while(count.next())
 			cateList.add(count.getString(1));
 		
