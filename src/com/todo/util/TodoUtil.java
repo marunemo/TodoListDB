@@ -398,7 +398,7 @@ public class TodoUtil {
 				currDate = format.format(today) + " 00:00:00";
 				dueDate = format.format(today) + " 23:59:59";
 			}
-			System.out.println(String.format("%2s [%s] %s%s%s | %s - %s ~ %s", id, category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
+			System.out.println(String.format("[%s] %s%s%s | %s - %s ~ %s", category, (isRequired==1?"★ ":""), title, (isCompleted==1?"[V]":""), desc, currDate, dueDate));
 		}
 	}
 	
