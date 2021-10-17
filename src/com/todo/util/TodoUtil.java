@@ -52,19 +52,13 @@ public class TodoUtil {
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
 		isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
-		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
 		Date today = new Date();
 		currDate = format.format(today);
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
 		if(stat.executeUpdate(createInsert) > 0) {
-			String createCateTable = "create table if not exists " + category
-					+ " (title text, desc text, dueDate text,"
-					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
-			stat.execute(createCateTable);
-			String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
-					+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
-			stat.executeUpdate(createCategory);
+			createCateTable(connect, stat, category, getId(connect, stat, this.tableName, title), title, desc, dueDate, currDate, isRequired, isRoutine, isRequired);
 			System.out.println("데이터가 추가되었습니다.");
 		}
 		else
@@ -72,6 +66,17 @@ public class TodoUtil {
 		
 		stat.close();
 		connect.close();
+	}
+	
+	private void createCateTable(Connection connect, Statement stat, String category, int id, String title, String desc, String dueDate, String currDate, int isCompleted, int isRoutine, int isRequired) throws SQLException {
+		String createCateTable = "create table if not exists " + category
+				+ " (id int, title text, desc text, dueDate text,"
+				+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
+		stat.execute(createCateTable);
+		
+		String createCategory = "insert into " + category + " (id, title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
+				+ "values (" + id + ", '" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
+		stat.executeUpdate(createCategory);
 	}
 	
 	public void readTodo() throws SQLException {
@@ -98,6 +103,12 @@ public class TodoUtil {
 		System.out.print("수정할 제목 : ");
 		String target = scan.nextLine().trim();
 		
+		if(containsTitle(target) == -1) {
+			System.err.println("존재하지 않는 제목입니다!!");
+			return;
+		}
+		String targetCategory = getCategory(connect, stat, this.tableName, target);
+		
 		System.out.print("새 제목 : ");
 		String title = scan.nextLine().trim();
 		
@@ -120,7 +131,7 @@ public class TodoUtil {
 		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
 		int isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
-		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd kk:mm:ss");
 		Date today = new Date();
 		String currDate = format.format(today);
 		String updateUpdate = "update " + this.tableName
@@ -129,12 +140,8 @@ public class TodoUtil {
 				+ "', currDate = '" + currDate + "', isRoutine = " + isRoutine 
 				+ ", isRequired = " + isRequired + " where title = '" + target + "';";
 		if(stat.executeUpdate(updateUpdate) > 0) {
-			String updateCategory = "update " + category
-					+ " set title = '" + title + "', desc = '" + desc
-					+ "', dueDate = '" + dueDate
-					+ "', currDate = '" + currDate + "', isRoutine = " + isRoutine 
-					+ ", isRequired = " + isRequired + " where title = '" + target + "';";
-			stat.executeUpdate(updateCategory);
+			deleteCateTable(connect, stat, targetCategory, target);
+			createCateTable(connect, stat, category, getId(connect, stat, this.tableName, title), title, desc, dueDate, currDate, isRequired, isRoutine, isRequired);
 			System.out.println("데이터가 수정되었습니다.");
 		}
 		else
@@ -155,20 +162,7 @@ public class TodoUtil {
 		
 		String deleteDelete = "delete from " + this.tableName + " where title = '" + title + "';";
 		if(stat.executeUpdate(deleteDelete) > 0) {
-			System.out.println(category);
-			int dataCount = 0;
-			ResultSet count = stat.executeQuery("select count(*) from " + category);
-			if(count.next())
-				dataCount = count.getInt(1);
-			
-			if(dataCount <= 1) {
-				String deleteTable = "drop table " + category + ";";
-				stat.executeUpdate(deleteTable);
-			}
-			else {
-				String deleteCategory = "delete from " + category + " where title = '" + title + "';";
-				stat.executeUpdate(deleteCategory);
-			}
+			deleteCateTable(connect, stat, category, title);
 			System.out.println("데이터가 수정되었습니다.");
 		}
 		else
@@ -176,6 +170,22 @@ public class TodoUtil {
 		
 		stat.close();
 		connect.close();
+	}
+	
+	private void deleteCateTable(Connection connect, Statement stat, String category, String title) throws SQLException {
+		int dataCount = 0;
+		ResultSet count = stat.executeQuery("select count(*) from " + category);
+		if(count.next())
+			dataCount = count.getInt(1);
+		
+		if(dataCount <= 1) {
+			String deleteTable = "drop table " + category + ";";
+			stat.executeUpdate(deleteTable);
+		}
+		else {
+			String deleteCategory = "delete from " + category + " where title = '" + title + "';";
+			stat.executeUpdate(deleteCategory);
+		}
 	}
 	
 	public void findTodo(String keyword) throws SQLException {
@@ -227,7 +237,7 @@ public class TodoUtil {
 		
 		System.out.println("키워드 <" + keyword + "> 를 포함한 총 " + cateList.size() + "개의 카테고리를 발견했습니다.");		
 		for(String category : cateList) {
-			String readSelect = "select * from " + category;
+			String readSelect = "select * from " + category + " order by id";
 			ResultSet result = stat.executeQuery(readSelect);
 			listAll(result, category);
 		}
@@ -384,6 +394,7 @@ public class TodoUtil {
 	
 	private void listAll(ResultSet rs, String category) throws SQLException {
 		while(rs.next()) {
+			String id = rs.getString("id");
 			String title = rs.getString("title");
 			String desc = rs.getString("desc");
 			String dueDate = rs.getString("dueDate");
