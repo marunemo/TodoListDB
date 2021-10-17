@@ -1,5 +1,7 @@
 package com.todo.util;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -9,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import com.google.gson.Gson;
 
 public class TodoUtil {
 	private String dbFile;
@@ -534,9 +538,10 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void exportTodo() throws SQLException {
+	public void exportTodo() throws SQLException, IOException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
+		Gson gson = new Gson();
 		
 		System.out.println("\n=== json 출력 ===");
 		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName);
@@ -545,12 +550,16 @@ public class TodoUtil {
 		
 		String readSelect = "select * from " + this.tableName;
 		ResultSet rs = stat.executeQuery(readSelect);
+		FileWriter writer = new FileWriter("TodoItem.json");
 		
 		while(rs.next()) {
 			TodoItem todo = new TodoItem(rs);
-			System.out.println(todo.toString());
+			String jsonData = gson.toJson(todo.toString());
+			writer.write(jsonData);
 		}
+		System.out.println("json 파일을 내보냈습니다! (파일명: TodoItem.json)");
 		
+		writer.close();
 		stat.close();
 		connect.close();
 	}
