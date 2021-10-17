@@ -32,7 +32,7 @@ public class TodoUtil {
 		System.out.print("제목 : ");
 		title = scan.nextLine().trim();
 		
-		if(containsTitle(title)) {
+		if(containsTitle(title) == -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
@@ -90,7 +90,7 @@ public class TodoUtil {
 		System.out.print("새 제목 : ");
 		String title = scan.nextLine().trim();
 		
-		if(!target.equals(title) && containsTitle(title)) {
+		if(!target.equals(title) && containsTitle(title) == -1) {
 			System.err.println("이미 존재하는 제목입니다!!");
 			return;
 		}
@@ -311,18 +311,18 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public boolean containsTitle(String title) throws SQLException {
+	public int containsTitle(String title) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
-		int returnCount = 0;
+		int returnId = -1;
 		
-		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where title = '" + title + "'");
-		if(count.next()) returnCount = count.getInt(1);
+		ResultSet count = stat.executeQuery("select id from " + this.tableName + " where title = '" + title + "'");
+		if(count.next()) returnId = count.getInt(1);
 		
 		stat.close();
 		connect.close();
 		
-		return (returnCount > 0);
+		return returnId;
 	}
 	
 	private void listAll(ResultSet rs) throws SQLException {
