@@ -381,9 +381,50 @@ public class TodoUtil {
 				
 		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where isCompleted = 1");
 		if(count.next())
-			System.out.println("총 " + count.getInt(1) + "개의 항목을 발견했습니다.");
+			System.out.println("총 " + count.getInt(1) + "개의 완료 항목을 발견했습니다.");
 		
 		String readSelect = "select * from " + this.tableName + " where isCompleted = 1";
+		ResultSet result = stat.executeQuery(readSelect);
+		listAll(result);
+		
+		stat.close();
+		connect.close();
+	}
+	
+	public void setRequire(String multi_item) throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+				
+		String[] items = multi_item.split(",");
+		for(String item : items) {
+			String title = item.trim();
+			String updateUpdate = "update " + this.tableName
+					+ " set isRequired = 1 where title = '" + title + "';";
+			if(stat.executeUpdate(updateUpdate) > 0) {
+				String updateCategory = "update " + getCategory(connect, stat, this.tableName, title)
+						+ " set isRequired = 1 where title = '" + title + "';";
+				stat.executeUpdate(updateCategory);
+			}
+			else {
+				System.err.println("완료 설정에 실패했습니다!");
+				return;
+			}
+		}
+		System.out.println("항목이 완료되었습니다.");
+		
+		stat.close();
+		connect.close();
+	}
+	
+	public void requireList() throws SQLException {
+		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
+		Statement stat = connect.createStatement();
+				
+		ResultSet count = stat.executeQuery("select count(*) from " + this.tableName + " where isRequired = 1");
+		if(count.next())
+			System.out.println("총 " + count.getInt(1) + "개의 중요 항목을 발견했습니다.");
+		
+		String readSelect = "select * from " + this.tableName + " where isRequired = 1";
 		ResultSet result = stat.executeQuery(readSelect);
 		listAll(result);
 		

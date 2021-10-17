@@ -59,6 +59,12 @@ public class TodoMain {
 					case "ls_comp":
 						todolist.completeList();
 						break;
+					case "req":
+						todolist.setRequire(scan.nextLine().trim());
+						break;
+					case "ls_req":
+						todolist.requireList();
+						break;
 					case "exit":
 						break;
 					case "help":
