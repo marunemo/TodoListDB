@@ -40,16 +40,16 @@ public class TodoUtil {
 		desc = scan.nextLine().trim();
 		System.out.print("카테고리 : ");
 		category = scan.nextLine().trim();
-		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n)");
-		isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n) ");
+		isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
 		if(isRoutine == 1)
 			dueDate = "";
 		else {
 			System.out.print("마감일 : ");
 			dueDate = scan.nextLine().trim();
 		}
-		System.out.print("중요 활동으로 설정하시겠습니까? (y/n)");
-		isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
+		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
+		isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
 		String createInsert = "insert into " + this.tableName + " (title, desc, category, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 				+ "values ('" + title + "', '" + desc + "', '" + category + "', '" + dueDate + "', datetime('now', 'localtime'), 0, " + isRoutine + ", " + isRequired +");";
@@ -98,15 +98,15 @@ public class TodoUtil {
 		String desc = scan.nextLine().trim();
 		System.out.print("새 카테고리 : ");
 		String category = scan.nextLine().trim();
-		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n)");
-		int isRoutine = (scan.nextLine().trim().equals("[yY]")?1:0);
+		System.out.print("매일 수행할 활동으로 설정하시겠습니까? (y/n) ");
+		int isRoutine = (scan.nextLine().trim().matches("[yY]")?1:0);
 		String dueDate = "";
 		if(isRoutine != 1) {			
 			System.out.print("새 마감일 : ");
 			dueDate = scan.nextLine().trim();
 		}
-		System.out.print("중요 활동으로 설정하시겠습니까? (y/n)");
-		int isRequired = (scan.nextLine().trim().equals("[yY]")?1:0);
+		System.out.print("중요 활동으로 설정하시겠습니까? (y/n) ");
+		int isRequired = (scan.nextLine().trim().matches("[yY]")?1:0);
 		
 		String updateUpdate = "update " + this.tableName
 				+ " set title = '" + title + "', desc = '" + desc
@@ -162,11 +162,11 @@ public class TodoUtil {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
-		ResultSet count = stat.executeQuery("select count(distinct category) from " + this.tableName);
+		ResultSet count = stat.executeQuery("select count(*) from sqlite_master where type = 'table' and not name = 'sqlite_sequence';");
 		if(count.next())
 			System.out.println("총 " + count.getInt(1) + "개의 카테고리를 발견했습니다.");
 		
-		String readSelect = "select distinct category from " + this.tableName;
+		String readSelect = "select name from sqlite_master where type = 'table' and not name = 'sqlite_sequence';";
 		ResultSet result = stat.executeQuery(readSelect);		
 		while(result.next())
 			System.out.print("[" + result.getString(1) + "] ");
