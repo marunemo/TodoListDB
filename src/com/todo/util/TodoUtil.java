@@ -62,7 +62,7 @@ public class TodoUtil {
 			String createCateTable = "create table if not exists " + category
 					+ " (title text, desc text, dueDate text,"
 					+ " currDate text, isCompleted int, isRoutine int, isRequired int);";
-			if(stat.executeUpdate(createCateTable) > 0) {
+			if(stat.execute(createCateTable)) {
 				String createCategory = "insert into " + category + " (title, desc, dueDate, currDate, isCompleted, isRoutine, isRequired)"
 						+ "values ('" + title + "', '" + desc + "', '" + dueDate + "', '" + currDate + "', 0, " + isRoutine + ", " + isRequired +");";
 				stat.executeUpdate(createCategory);
