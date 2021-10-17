@@ -172,7 +172,7 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void deleteList(String multi_item) throws SQLException {
+	public void deleteTodo(String multi_item) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 		
@@ -350,16 +350,26 @@ public class TodoUtil {
 		connect.close();
 	}
 	
-	public void completeTodo(int index) throws SQLException {
+	public void completeTodo(String multi_item) throws SQLException {
 		Connection connect = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
 		Statement stat = connect.createStatement();
 				
-		String updateUpdate = "update " + this.tableName
-				+ " set isCompleted = 1 where id = '" + index + "';";
-		if(stat.executeUpdate(updateUpdate) > 0)
-			System.out.println("항목이 완료되었습니다.");
-		else
-			System.err.println("완료 설정에 실패했습니다!");
+		String[] items = multi_item.split(",");
+		for(String item : items) {
+			String title = item.trim();
+			String updateUpdate = "update " + this.tableName
+					+ " set isCompleted = 1 where title = '" + title + "';";
+			if(stat.executeUpdate(updateUpdate) > 0) {
+				String updateCategory = "update " + getCategory(connect, stat, this.tableName, title)
+						+ " set isCompleted = 1 where title = '" + title + "';";
+				stat.executeUpdate(updateCategory);
+			}
+			else {
+				System.err.println("완료 설정에 실패했습니다!");
+				return;
+			}
+		}
+		System.out.println("항목이 완료되었습니다.");
 		
 		stat.close();
 		connect.close();
