@@ -22,7 +22,9 @@ public class TodoMain {
 						todolist.createTodo();
 						break;
 					case "del":
-						todolist.deleteTodo();
+						String next = scan.nextLine().trim();
+						if(next.equals("")) todolist.deleteTodo();
+						else todolist.deleteTodo(next);
 						break;
 					case "edit":
 						todolist.updateTodo();
@@ -52,10 +54,22 @@ public class TodoMain {
 						todolist.categoryList();
 						break;
 					case "comp":
-						todolist.completeTodo(Integer.parseInt(scan.nextLine().trim()));
+						todolist.completeTodo(scan.nextLine().trim());
 						break;
 					case "ls_comp":
 						todolist.completeList();
+						break;
+					case "req":
+						todolist.setRequire(scan.nextLine().trim());
+						break;
+					case "ls_req":
+						todolist.requireList();
+						break;
+					case "clean":
+						todolist.clearTodo();
+						break;
+					case "export":
+						todolist.exportTodo();
 						break;
 					case "exit":
 						break;

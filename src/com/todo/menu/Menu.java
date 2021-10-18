@@ -14,8 +14,12 @@ public class Menu {
         System.out.println("find <키워드> : 제목이나 내용에서 <키워드>를 포함하고 있는 모든 Todo 항목을 출력합니다.");
         System.out.println("find_cate <키워드> : 카테고리에서 <키워드>를 포함하고 있는 모든 Todo 항목을 출력합니다.");
         System.out.println("ls_cate : 현재 Todo 항목에 등록된 모든 카테고리를 출력합니다.");
-        System.out.println("comp <번호> : 해당 <번호>를 가진 항목을 완료합니다.");
+        System.out.println("comp <제목> : 해당 제목들을 가진 항목을 완료합니다.");
         System.out.println("ls_comp : 완료된 항목을 출력합니다.");
+        System.out.println("req <제목> : 해당 제목들을 가진 항목에 중요 표시를 합니다.");
+        System.out.println("ls_req : 중요 표시된 항목을 출력합니다.");
+        System.out.println("clean : Todo 항목들을 정리합니다.");
+        System.out.println("export : Todo 항목을 json 파일로 내보냅니다.");
         System.out.println("exit : 프로그램을 종료합니다.");
     }
     
